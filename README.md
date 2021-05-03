@@ -1,4 +1,4 @@
-# Jager-Bot
+# Jäger Bot
 A bot created for the [Jäger Army Discord Server](https://discord.gg/TTZVkFhqkP)
 
  (This bot is not available to the public)
