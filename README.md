@@ -29,6 +29,7 @@ A bot created for the [Jäger Army Discord Server](https://discord.gg/TTZVkFhqkP
   * `sus <user>`
   * `sexy <user>`
   * `shoot <user>`
+  * `poll <ping> <question> <answer1> [answer2]...`
 
 
 * Siege

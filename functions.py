@@ -14,6 +14,7 @@ partnerChannel = 812059541414871060
 staffID = 820297954618769409
 sotwRoleID = 771887695654944799
 formerSotwRoleID = 772257145018122293
+donatorTierVID = 823005150281072650
 
 async def updateListDB(key, value):
   key = str(key)

@@ -50,6 +50,7 @@ class help(commands.Cog):
           `sus <user>` | Calculate someone's sussiness!!
           `sexy <user>` | Sexy meter
           `shoot <user>` | Shoot someone
+          `poll <ping> <question> <answer1> [answer2]...`
         """,
         color=defaultColor
       )

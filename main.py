@@ -65,6 +65,7 @@ async def on_ready():
   bot.load_extension("cogs.embeds")
   bot.load_extension("cogs.randomxp")
   bot.load_extension("cogs.tags")
+  bot.load_extension("cogs.polls")
 
   updateCategories.start()
 
