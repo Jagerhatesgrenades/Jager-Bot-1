@@ -33,8 +33,8 @@ class help(commands.Cog):
         description="""
           Prefix = `j!`
 
-          `nominate` | Nominate someone for SOTW
-          `vote` | Vote for someone
+          `nominate <user>` | Nominate someone for SOTW
+          `vote <user>` | Vote for someone
           `nominations` | See all the nominated users
           `votes` | See all the votes per user
         """,
@@ -116,7 +116,7 @@ class help(commands.Cog):
 
           `rules [action] *args` | Server rules
           ┡`rules add <text>` | Add a rule
-          ┡`rules remove <rule>` | Remove a rule
+          ┡`rules delete <rule>` | Remove a rule
           ┡`rules edit <rule> <text>` | Edit a rule
           ┖`rules update <rules msg id>` | Update the rules embed in the rules channel
         """,
@@ -130,9 +130,9 @@ class help(commands.Cog):
           Prefix = `j!`
 
           `tags [action] *args` | List of all the tags
-          ┡`tags add <tag name> <tag reply>` | Add a rule
-          ┡`tags delete <tag name>` | Remove a rule
-          ┖`tags edit <tag name> <new tag reply>` | Edit a rule
+          ┡`tags add <tag name> <tag reply>` | Add a tag
+          ┡`tags delete <tag name>` | Remove a tag
+          ┖`tags edit <tag name> <new tag reply>` | Edit a tag
         """,
         color=defaultColor
       )
