@@ -76,5 +76,32 @@ class fun(commands.Cog):
       await ctx.trigger_typing()
       await ctx.send(f"{ctx.author.mention}, I selected `{items}`")
 
+  @commands.command()
+  async def rps(self, ctx, userChoice):
+    userChoice = userChoice.lower()
+    rpsList = ["rock", "paper", "scissors"]
+    winDict = {"rock": "scissors", "paper": "rock", "scissors": "paper"}
+    if userChoice in rpsList:
+      botChoice = rpsList[random.randint(0,2)]
+      winMsg = f"I chose **{botChoice}**, I win!"
+      tieMsg = f"I chose **{botChoice}**, it's a tie!"
+      loseMsg = f"I chose **{botChoice}**, You win!"
+
+      if winDict[userChoice] == botChoice:
+        await ctx.trigger_typing()
+        await ctx.send(loseMsg)
+
+      elif userChoice == botChoice:
+        await ctx.trigger_typing()
+        await ctx.send(tieMsg)
+
+      elif winDict[userChoice] != botChoice:
+        await ctx.trigger_typing()
+        await ctx.send(winMsg)
+
+    else:
+      await ctx.trigger_typing()
+      await ctx.send(f"{userChoice} isn't a valid choice!")
+
 def setup(bot):
   bot.add_cog(fun(bot))

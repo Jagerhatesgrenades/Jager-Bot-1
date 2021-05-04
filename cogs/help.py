@@ -50,7 +50,9 @@ class help(commands.Cog):
           `sus <user>` | Calculate someone's sussiness!!
           `sexy <user>` | Sexy meter
           `shoot <user>` | Shoot someone
-          `poll <ping> <question> <answer1> [answer2]...`
+          `poll <ping> <question> <answer1> [answer2]...` | Make a poll
+          `randomchoice <amount of items> <item 1> [item2]...` | Get a random item from the specified list of items
+          `rps <choice>` | Play a game of rps
         """,
         color=defaultColor
       )
