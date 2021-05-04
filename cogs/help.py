@@ -9,6 +9,9 @@ class help(commands.Cog):
 
   @commands.command()
   async def help(self, ctx, cat=None):
+    if cat:
+      cat = cat.lower()
+
     if not cat:
       helpEmbed = discord.Embed(
         title="Help Menu",
