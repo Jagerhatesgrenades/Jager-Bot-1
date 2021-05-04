@@ -30,6 +30,7 @@ A bot created for the [Jäger Army Discord Server](https://discord.gg/TTZVkFhqkP
   * `sexy <user>`
   * `shoot <user>`
   * `poll <ping> <question> <answer1> [answer2]...`
+  * `randomchoice <amount of items> <item 1> [item2]...`
 
 
 * Siege

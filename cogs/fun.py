@@ -53,7 +53,7 @@ class fun(commands.Cog):
     await ctx.send(embed=shootEmbed)
 
   @commands.command()
-  async def randomchoice(self, ctx, n,*choices):
+  async def randomchoice(self, ctx, n: int, *choices):
     if n == 0:
       await ctx.trigger_typing()
       await ctx.send(f"{ctx.author.mention}, i chose nothing!")
@@ -63,6 +63,7 @@ class fun(commands.Cog):
       await ctx.send(f"{ctx.author.mention}, selecting 1 random item...")
       time.sleep(1)
       item = random.sample(choices, n)
+      item = "".join(item)
       await ctx.trigger_typing()
       await ctx.send(f"{ctx.author.mention}, I selected `{item}`")
 
