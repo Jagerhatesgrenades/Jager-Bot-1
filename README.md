@@ -1,7 +1,7 @@
 # Jäger Bot
 A bot created for the [Jäger Army Discord Server](https://discord.gg/TTZVkFhqkP)
 
- (This bot is not available to the public)
+ (This bot is not available to the public, and directly copying this code won't work since a lot of stuff is configured for one server)
 
 ## Commands
 ### Prefix = j!
