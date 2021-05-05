@@ -103,5 +103,10 @@ class fun(commands.Cog):
       await ctx.trigger_typing()
       await ctx.send(f"{userChoice} isn't a valid choice!")
 
+  @commands.command()
+  async def ping(self, ctx):
+    await ctx.trigger_typing()
+    await ctx.send(f"Ping: {round(self.bot.latency * 1000)} ms")
+
 def setup(bot):
   bot.add_cog(fun(bot))

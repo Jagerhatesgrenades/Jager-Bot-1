@@ -191,3 +191,12 @@ regionalIndicators = [
 ":regional_indicator_i:",
 ":regional_indicator_j:"
 ]
+
+staffRoles = [
+  810585594638893096,
+  769577839313551360,
+  810586176515080223,
+  769579500752863243
+]
+
+staffRolesDict = {"Admin": 810585594638893096, "Trial Admin": 769577839313551360, "Mod": 810586176515080223, "Trial Mod": 769579500752863243}

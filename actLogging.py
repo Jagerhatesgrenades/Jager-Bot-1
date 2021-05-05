@@ -100,3 +100,29 @@ async def logRuleDelete(user, ruleN, rule):
   logEmbed.set_footer(text=user, icon_url=user.avatar_url)
 
   return logEmbed
+
+async def logPromotion(user, promoter, promotionRole):
+  logEmbed = discord.Embed(
+    title="Promotion",
+    description=f"**{promoter}** promoted **{user}** to **{promotionRole.name}**",
+    color=defaultColor
+  )
+
+  logEmbed.set_author(**embedAuthor)
+  logEmbed.timestamp = datetime.datetime.utcnow()
+  logEmbed.set_footer(text=user, icon_url=user.avatar_url)
+
+  return logEmbed
+
+async def logDemotion(user, demoter, demotionRole):
+  logEmbed = discord.Embed(
+    title="Demotion",
+    description=f"**{demoter}** demoted **{user}** to **{demotionRole.name}**",
+    color=defaultColor
+  )
+
+  logEmbed.set_author(**embedAuthor)
+  logEmbed.timestamp = datetime.datetime.utcnow()
+  logEmbed.set_footer(text=user, icon_url=user.avatar_url)
+
+  return logEmbed

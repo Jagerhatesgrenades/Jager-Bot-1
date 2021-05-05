@@ -55,6 +55,5 @@ class wordDetection(commands.Cog):
             await msg.channel.trigger_typing()
             await msg.channel.send(tagReply)
 
-  
 def setup(bot):
   bot.add_cog(wordDetection(bot))

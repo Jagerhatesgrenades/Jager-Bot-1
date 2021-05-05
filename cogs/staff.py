@@ -1,10 +1,13 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
+from functions import staffRoles, staffRolesDict, staffID
+from actLogging import logPromotion, logDemotion
 
 class staff(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
+    self.loggingChannel = self.bot.get_channel(838724538220937307)
 
   @commands.command()
   @has_permissions(manage_roles=True)
@@ -52,7 +55,6 @@ class staff(commands.Cog):
     else:
       await ctx.trigger_typing()
       await ctx.send("You don't have the permission to do this!")
-
 
 def setup(bot):
   bot.add_cog(staff(bot))

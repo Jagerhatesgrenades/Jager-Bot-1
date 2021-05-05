@@ -54,18 +54,10 @@ async def on_ready():
   if "tags" not in db.keys():
     db["tags"] = {}
 
-  bot.load_extension("cogs.fun")
-  bot.load_extension("cogs.help")
-  bot.load_extension("cogs.info")
-  bot.load_extension("cogs.staff")
-  bot.load_extension("cogs.siege")
-  bot.load_extension("cogs.sotw")
-  bot.load_extension("cogs.wordDetection")
-  bot.load_extension("cogs.apis")
-  bot.load_extension("cogs.embeds")
-  bot.load_extension("cogs.randomxp")
-  bot.load_extension("cogs.tags")
-  bot.load_extension("cogs.polls")
+  for filename in os.listdir("./cogs"):
+    if filename.endswith(".py"):
+      bot.load_extension(f"cogs.{filename[:-3]}")
+      print(f"Loaded cog {filename[:-3]}")
 
   updateCategories.start()
 
