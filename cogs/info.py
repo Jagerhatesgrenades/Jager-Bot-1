@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from functions import embedAuthor, defaultColor
+from functions import embedAuthor, defaultColor, staffRolesDict
 import datetime
 
 class info(commands.Cog):
@@ -41,26 +41,27 @@ class info(commands.Cog):
 
   @commands.command()
   async def userinfo(self, ctx, user: discord.Member):
-    staffRoles = {"Admin": 810585594638893096, "Trial Admin": 769577839313551360, "Mod": 810586176515080223, "Trial Mod": 769579500752863243}
-
     boosterRoles = {1: 773375163303591948, 2: 833328572600942689}
 
     userColor = [role.color for role in reversed(user.roles) if str(role.color) != "#000000"][0]
 
-    for role in user.roles:
-      for name, roleId in staffRoles.items():
-        if role.id == roleId:
-          userStaffRole = discord.utils.get(ctx.guild.roles, id=roleId)
-          userStaff = True
-          break
+    userStaff = False
+    userBooster = False
+
+    userStaffRole = None
+    userBoosterRole = None
 
     for role in user.roles:
-      for name, roleId in reversed(boosterRoles.items()):
+      for name, roleId in staffRolesDict.items():
         if role.id == roleId:
-          userBoosterRole = discord.utils.get(ctx.guild.roles, id=roleId)
+          userStaffRole = discord.utils.get(ctx.guild.roles, id=roleId).mention
+          userStaff = True
+
+    for role in user.roles:
+      for name, roleId in boosterRoles.items():
+        if role.id == roleId:
+          userBoosterRole = discord.utils.get(ctx.guild.roles, id=roleId).mention
           userBooster = True
-          break
-    
 
     userEmbed = discord.Embed(
       title=user,
@@ -72,10 +73,10 @@ class info(commands.Cog):
       "Nickname": f"`{user.display_name}`",
       "Color": f"`{userColor}`",
       "Staff": f"`{userStaff}`",
-      "Staff role": userStaffRole.mention,
+      "Staff role": userStaffRole,
       "Bot": f"`{user.bot}`",
       "Booster": f"`{userBooster}`",
-      "Booster role": userBoosterRole.mention,
+      "Booster role": userBoosterRole,
       "Account creation date": user.created_at,
       "Join date": user.joined_at
     }

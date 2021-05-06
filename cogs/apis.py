@@ -83,11 +83,6 @@ class apis(commands.Cog):
         await ctx.send(f"{ctx.author.mention}, You took too long!\nThe answer was **{correctAnswer}**")
         break
 
-  @commands.command()
-  async def test(self, ctx):
-    await ctx.trigger_typing
-    await ctx.send("test")
-
 
 def setup(bot):
   bot.add_cog(apis(bot))
