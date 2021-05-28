@@ -4,6 +4,7 @@ from discord.ext.commands import has_permissions
 from functions import defaultColor, embedAuthor, updateListDB
 from actLogging import logRuleAdd, logRuleDelete, logRuleEdit
 from replit import db
+import datetime
 
 class embeds(commands.Cog):
   def __init__(self, bot):
@@ -98,6 +99,40 @@ class embeds(commands.Cog):
     rulesEmbed.set_author(**embedAuthor)
 
     await rulesMsg.edit(embed=rulesEmbed)
+
+  @commands.command()
+  async def rule(self, ctx, rule: int):
+    ruleDB = db["rules"]
+    ruleIndex = rule - 1
+    try:
+      ruleText = ruleDB[ruleIndex]
+
+      ruleEmbed = discord.Embed(
+        title=f"Rule {rule}",
+        description=ruleText,
+        color=defaultColor
+      )
+
+      ruleEmbed.set_author(**embedAuthor)
+      ruleEmbed.timestamp = datetime.datetime.utcnow()
+      ruleEmbed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+
+      await ctx.trigger_typing()
+      await ctx.send(embed=ruleEmbed)
+    
+    except IndexError:
+      if rule == 34:
+        await ctx.trigger_typing()
+        await ctx.send("https://scontent-amt2-1.xx.fbcdn.net/v/t1.6435-9/122404365_1014809552372249_2820271129723816876_n.jpg?_nc_cat=109&ccb=1-3&_nc_sid=8bfeb9&_nc_ohc=Q-8cw98HNW4AX-BN98H&_nc_ht=scontent-amt2-1.xx&oh=be3c70b9e5cde569727f57f1a35cf2b7&oe=60C66E1A")
+
+      elif rule == 69:
+        await ctx.trigger_typing()
+        await ctx.send("Nice")
+
+      else:
+        await ctx.trigger_typing()
+        await ctx.send(f"I couldn't find rule {rule}")
+
 
 def setup(bot):
   bot.add_cog(embeds(bot))

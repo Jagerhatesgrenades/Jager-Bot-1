@@ -1,8 +1,8 @@
 import discord
 
-
 #operator profiles
 embeds = {}
+
 #sledge
 embeds["sledge"] = discord.Embed(
 title="Sledge",

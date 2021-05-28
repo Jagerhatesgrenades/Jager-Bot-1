@@ -25,6 +25,7 @@ class help(commands.Cog):
           ┡`info` | Info commands
           ┡`tags` | Tag commands
           ┡`rules` | Rule commands
+          ┡`xp` | XP commands
           ┖`staff` | Staff only commands
         """,
         color=defaultColor
@@ -40,6 +41,10 @@ class help(commands.Cog):
           `vote <user>` | Vote for someone
           `nominations` | See all the nominated users
           `votes` | See all the votes per user
+          `startvote` | Start the voting process
+          `finishvote` | Finish the voting process
+          `resetsotw` | Reset the SOTW sytem
+          `setsotw <user>` | Set a member as SOTW (removes the old sotw)
         """,
         color=defaultColor
       )
@@ -103,13 +108,13 @@ class help(commands.Cog):
 
           These commands are staff only
 
-          `startvote` | Start the voting process
-          `finishvote` | Finish the voting process
           `role <action> <role> <user>` | Give or remove a role to or from a user
           ┡`role give <role> <user>` | Give a role to user (Aliases: `add` `grant` )
           ┖`role remove <role> <user>` | Remove a role from a user (Aliases: `take`)
           `rolecolor <role> <color>` | Change the color of a role
           `rolename <role> <name>` | Change the name of a role
+          `promote <user>` | Promote a user to a higher staff rank
+          `demote <user>` | Demote a user to a lower staff rank
         """,
         color=defaultColor
       )
@@ -139,6 +144,22 @@ class help(commands.Cog):
           ┡`tags add <tag name> <tag reply>` | Add a tag
           ┡`tags delete <tag name>` | Remove a tag
           ┖`tags edit <tag name> <new tag reply>` | Edit a tag
+        """,
+        color=defaultColor
+      )
+
+    elif cat == "xp":
+      helpEmbed = discord.Embed(
+        title="Help Menu",
+        description="""
+          Prefix = `j!`
+
+          `rank [user]` | Get the users XP rank
+          `top [page]` | The XP leaderboard
+          `addxp <user> <amount>` | Give XP to a user, insert a negative number to remove XP
+          `multipliers [action] *args` | list of all multipliers
+          ┖`multipliers set <role> <amount>` | Set a role's multiplier
+          `sync [all]` | Sync your level roles, `all` to sync every member
         """,
         color=defaultColor
       )

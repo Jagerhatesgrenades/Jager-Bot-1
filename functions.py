@@ -1,7 +1,7 @@
 from replit import db
 import discord
 
-defaultColor = 0x800080
+defaultColor = 0xB00B69
 embedAuthor = {
   "name": "Jäger Bot",
   "icon_url": "https://cdn.discordapp.com/avatars/816636186323189780/019dbb41d6f5b301c1fce6980d487f23.webp?size=128"
@@ -75,11 +75,24 @@ def TTTCheck(author):
 
   return inner_check
 
-async def convertToMember(user: discord.Member):
+def convertToMember(user: discord.Member):
   return user
 
-async def convertToRole(role: discord.Role):
+def convertToRole(role: discord.Role):
   return role
+
+async def lockChannel(guild, channel: discord.TextChannel):
+  perms = channel.overwrites_for(guild.default_role)
+  perms.send_messages = False
+  await channel.set_permissions(guild.default_role, overwrite=perms, reason=f"Locked the channel")
+
+async def unlockChannel(guild, channel: discord.TextChannel):
+  perms = channel.overwrites_for(guild.default_role)
+  perms.send_messages = True
+  await channel.set_permissions(guild.default_role, overwrite=perms, reason=f"Unlocked the channel")
+  
+def getColor(user: discord.Member):
+  return [role.color for role in reversed(user.roles) if str(role.color) != "#000000"][0]
 
 operatorList = ["sledge", "thatcher", "ash", "thermite", "twitch", "montagne", "glaz", "fuze", "blitz", "iq", "buck", "blackbeard", "capitao", "hibana", "jackal", "ying", "zofia", "dokkaebi", "lion", "finka", "maverick", "nomad", "gridlock", "nokk", "amaru", "kali", "iana", "ace", "zero", "flores", "smoke", "mute", "castle", "pulse", "doc", "rook", "kapkan", "tachanka", "jager", "bandit", "frost", "valkyrie", "caveira", "echo", "mira", "lesion", "ela", "vigil", "maestro", "alibi", "clash", "kaid", "mozzie", "warden", "goyo", "wamai", "oryx", "melusi", "aruni"]
 
@@ -193,6 +206,8 @@ regionalIndicators = [
 ]
 
 staffRoles = [
+  769577772652691486,
+  834184731193114714,
   810585594638893096,
   769577839313551360,
   810586176515080223,
@@ -202,6 +217,8 @@ staffRoles = [
 ]
 
 staffRolesDict = {
+  "Owner": 769577772652691486,
+  "Co Owner": 834184731193114714,
   "Admin": 810585594638893096,
   "Trial Admin": 769577839313551360,
   "Mod": 810586176515080223,
@@ -209,3 +226,27 @@ staffRolesDict = {
   "Helper": 839209488727932969,
   "Trial Helper": 839209591887364126
 }
+
+levelRoles = {
+0: 835901251714678836,
+5: 769579510902947861,
+10: 769579510181658664,
+15: 769579509363376168,
+20: 769579506766708816,
+30: 769579505295032351,
+40: 769579505646829593,
+50: 769579504237674547,
+60: 769579503675506698,
+70: 769579502606090250,
+80: 833369830186811392,
+90: 833369823957614612,
+100: 833369826709471282
+}
+
+NoPermErrorMessages = [
+  "Nah bro",
+  "Not feeling like it today",
+  "Im busy",
+  "Make me",
+  "No lol"
+]

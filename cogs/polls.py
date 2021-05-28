@@ -9,7 +9,7 @@ class polls(commands.Cog):
     self.bot = bot
 
   @commands.command()
-  @has_any_role(staffID, donatorTierVID)
+  @has_any_role(staffID, donatorTierVID, 769577772652691486)
   async def poll(self, ctx, ping, question, *args):
     questionsList = "\n".join(f"{regionalIndicators[i]} {answer}" for i, answer in enumerate(args))
 
@@ -34,6 +34,8 @@ class polls(commands.Cog):
 
     for i in range(0, len(args)):
       await pollMsg.add_reaction(emojis[i])
+
+    await ctx.message.delete()
 
 def setup(bot):
   bot.add_cog(polls(bot))

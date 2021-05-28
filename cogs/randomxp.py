@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import has_permissions
 import random
+from replit import db
 
 chars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '!', '@', '#', '$', '%', '^', '&', '(', ')']
 
@@ -12,10 +13,7 @@ class randomxp(commands.Cog):
 
   @tasks.loop(minutes=60.0)
   async def xpEvent(self):
-    await self.bot.wait_for("message", timeout=60.0)
-
     genChannel = self.bot.get_channel(819746637894778930)
-    logChannel = self.bot.get_channel(837701500779888670)
     randomN = random.randint(0, 3)
 
     if randomN == 0:
@@ -30,10 +28,7 @@ class randomxp(commands.Cog):
       code = "".join(code)
 
       await genChannel.trigger_typing()
-      await genChannel.send(f"""
-      **XP EVENT**
-      The first person to send **{code}** gets {xpAmount} XP!
-      """)
+      await genChannel.send(f"**XP EVENT**\nThe first person to send **{code}** gets {xpAmount} XP!")
 
       def check(msg):
         return msg.channel == genChannel and msg.content == code
@@ -42,8 +37,17 @@ class randomxp(commands.Cog):
 
       winner = msg.author
 
+      if str(winner.id) in db["xp"]:
+        currentXP = db["xp"][str(winner.id)][0]
+        
+        currentXP += xpAmount
+
+        db["xp"][str(winner.id)][0] = currentXP
+
+      else:
+        db["xp"][str(winner.id)] = [xpAmount, 0]
+
       await genChannel.trigger_typing()
-      await logChannel.send(f"{winner} has earned {xpAmount} XP")
       await genChannel.send(f"Congrats {winner.mention}! You have won {xpAmount} XP!")
 
   @commands.command()
@@ -73,7 +77,7 @@ class randomxp(commands.Cog):
 
     winner = msg.author
 
-    await logChannel.send(f"{winner} has earned {xpAmount} XP")
+    await logChannel.send(f"{winner} | `{winner.id}` has earned {xpAmount} XP (This is a test by {ctx.author})")
     await ctx.send(f"Congrats {winner.mention}! You have won {xpAmount} XP!")
 
 def setup(bot):

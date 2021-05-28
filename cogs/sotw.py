@@ -1,9 +1,8 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-from discord.ext.commands import has_role, has_permissions
-from functions import checkFor, updateDictDB, updateListDB, defaultColor, embedAuthor, staffID, sotwRoleID, formerSotwRoleID
-from statistics import mode as mathMode
+from discord.ext.commands import has_permissions
+from functions import defaultColor, embedAuthor, sotwRoleID, formerSotwRoleID, emojis, regionalIndicators, lockChannel, unlockChannel
 from replit import db
 from collections import Counter
 import datetime
@@ -11,262 +10,258 @@ import datetime
 class sotw(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
-    
-  @commands.command()
-  async def nominate(self, ctx, nominatedUser: discord.Member):
-    nominatorUser = ctx.author
-    isVoting = db["isVoting"]
 
-    if not isVoting:
-      if not await checkFor(nominatorUser.mention, "nominators"):
-        await updateListDB("nominations", nominatedUser.mention)
-        await updateListDB("nominators", nominatorUser.mention)
-        await updateDictDB("nominationsPerUser", nominatorUser.mention, nominatedUser.mention)
-        await ctx.trigger_typing()
-        await ctx.send(f"**{nominatorUser.display_name}** nominated **{nominatedUser.display_name}**")
-      
-      else:
-        await ctx.trigger_typing()
-        await ctx.send("You already nominated someone!")
+  def checkFor(self, value, key, keyVal):
+    if key in db.keys():
+      if keyVal == "key":
+        if value in db[key].keys():
+          return True
+
+        else:
+          return False
+
+      elif keyVal == "val":
+        if value in db[key].values():
+          return True
+
+        else:
+          return False
 
     else:
-      await ctx.trigger_typing()
-      await ctx.send("You can't nominate during the voting process!")
+      return False
 
   @commands.command()
-  async def vote(self, ctx, votedUser: discord.Member):
-    voterUser = ctx.author
-    isVoting = db["isVoting"]
+  async def nominate(self, ctx, user: discord.Member):
+    if not db["isVoting"]:
+      if not self.checkFor(str(ctx.author.id), "nominations", "key"):
+        if not user.bot:
+          if formerSotwRoleID not in list([role.id for role in user.roles]):
+            db["nominations"][str(ctx.author.id)] = str(user.id)
 
-    if isVoting:
-      if not await checkFor(voterUser.mention, "voters"):
-        if await checkFor(votedUser.mention, "nominations"):
-          await updateListDB("votes", votedUser.mention)
-          await updateListDB("voters", voterUser.mention)
-          await updateDictDB("votesPerUser", voterUser.mention, votedUser.mention)
-          await ctx.trigger_typing()
-          await ctx.send(f"**{voterUser.display_name}** voted for **{votedUser.display_name}**")
+            nomEmbed = discord.Embed(
+              description=f"{user.mention} has been nominated by {ctx.author.mention}",
+              color=defaultColor
+            )
+
+            await ctx.trigger_typing()
+            await ctx.send(embed=nomEmbed)
+
+          else:
+            await ctx.trigger_typing()
+            await ctx.send("You can't nominate someone who has the former SOTW role")
 
         else:
           await ctx.trigger_typing()
-          await ctx.send("You have to vote for a nominated user!")
-      
+          await ctx.send("You can't nominate a bot")
+
       else:
         await ctx.trigger_typing()
-        await ctx.send("You already voted for someone!")
-      
+        await ctx.send("You already nominated someone")
+
     else:
       await ctx.trigger_typing()
-      await ctx.send("You can't vote right now!")
-  
-  @commands.command()
-  @has_role(staffID)
-  async def startvote(self, ctx):
-    isVoting = db["isVoting"]
-    nominees = "\n".join(db["nominations"])
+      await ctx.send("You can't nominate while voting")
 
-    if not isVoting:
+  @commands.command()
+  async def vote(self, ctx, user: discord.Member):
+    if db["isVoting"]:
+      if not self.checkFor(str(ctx.author.id), "votes", "key"):
+        if self.checkFor(str(user.id), "nominations", "val"):
+          db["votes"][str(ctx.author.id)] = str(user.id)
+
+          voteEmbed = discord.Embed(
+            description=f"**{ctx.author.display_name}** has voted for **{user.display_name}**",
+            color=defaultColor
+          )
+
+          await ctx.trigger_typing()
+          await ctx.send(embed=voteEmbed)
+
+        else:
+          await ctx.trigger_typing()
+          await ctx.send("You have for a nominated user")
+
+      else:
+        await ctx.trigger_typing()
+        await ctx.send("You already voted for someone")
+
+    else:
+      await ctx.trigger_typing()
+      await ctx.send("You can't vote while nominating")
+
+  @commands.command()
+  @has_permissions(manage_roles=True)
+  async def startvote(self, ctx):
+    if not db["isVoting"]:
       db["isVoting"] = True
-      
-      votingEmbed = discord.Embed(
+
+      nominationIDs = []
+      for userID in db["nominations"].values():
+        if userID not in nominationIDs:
+          nominationIDs.append(userID)
+
+      nominations = "\n".join([f"**{i}.** {get(ctx.guild.members, id=int(user))}" for i, user in enumerate(nominationIDs)])
+
+      startVoteEmbed = discord.Embed(
         title="Vote for SOTW",
         description=f"""
-          `j!vote <user>`
+        Vote for the next SOTW with `j!vote <user>`
 
-          {nominees}
+        Nominations
+        {nominations}
+
         """,
         color=defaultColor
       )
 
-      votingEmbed.set_author(**embedAuthor)
-      votingEmbed.timestamp = datetime.datetime.utcnow()
-      votingEmbed.set_footer(**embedAuthor, icon_url=ctx.author.avatar_url)
-      
       await ctx.trigger_typing()
-      await ctx.send(embed=votingEmbed)
-      await ctx.trigger_typing()
-      await ctx.send("<@820074719419695154>")
+      await ctx.send("<@&820074719419695154>")
+      await ctx.send(embed=startVoteEmbed)
 
     else:
       await ctx.trigger_typing()
-      await ctx.send("The voting process has already begun!")
+      await ctx.send("Voting has already started")
 
   @commands.command()
-  @has_role(staffID)
+  @has_permissions(manage_roles=True)
   async def finishvote(self, ctx):
-    isVoting = db["isVoting"]
-
-    if isVoting:
-      db["isVoting"] = False
-
-      votesList = []
-
-      countDict = Counter(db["votes"])
-
-      dupes = {}
-
-      for i, (k, v) in enumerate(countDict):
-        for x in countDict:
-          if countDict.index(x) > i and v == countDict[x]:
-            dupes[k] = v
-
-      if dupes:
-        db["dupes"] = dupes
-
-        letterEmojis = ("🇦", "🇧", "🇨", "🇩", "🇪")
-
-        letters = [
-          ":regional_indicator_a:",
-          ":regional_indicator_b:",
-          ":regional_indicator_c:",
-          ":regional_indicator_d:",
-          ":regional_indicator_b:"
-        ]
-
-
-        dupeNames = ", ".join([k for k in dupes])
-        
-        poll = "\n".join([f"{letters[i]} {dupes[i]}" for i in range(0, len(dupes))])
-
-        for k, v in dupes:
-          voteAmount = v
-          break
-
-        sotwPollEmbed = discord.Embed(
-          title="It's a tie!",
-          description=f"""
-            It's a tie between
-            {dupeNames}
-
-            They both got **{voteAmount}** Votes!
-
-            Vote for the next SOTW in the poll below!
-
-            {poll}
-
-            Duplicate votes won't count!
-          """,  
-          color=defaultColor
-        )
-
-        sotwPollEmbed.set_author(**embedAuthor)
-        sotwPollEmbed.timestamp = datetime.datetime.utcnow()
-
-        await ctx.trigger_typing()
-        pollMsg = await ctx.send(embed=sotwPollEmbed)
-
-        for i in range(0, len(dupes)):
-          await pollMsg.add_reaction(letterEmojis[i])
-      
-      else:
-        newSOTW = mathMode(db["votes"])
-
-        for item in countDict:
-          votesList.append(f"{item}: **{countDict[item]}**")
-
-        votesList = "\n".join(votesList)
-      
+    if db["isVoting"]:
+      votes = Counter(db["votes"].values())
+      votes = dict(reversed(sorted(votes.items(), key=lambda kv: kv[1])))
+      highestIDs = [userID for userID, count in votes.items() if count == max(votes.values())]
+      if len(highestIDs) == 1:
+        newSotw = get(ctx.guild.members, id=int(highestIDs[0]))
+  
         finishEmbed = discord.Embed(
           title="New SOTW",
-          description=f"""
-            Our new SOTW is **{newSOTW}**!
+          description=f"The new SOTW is {newSotw.mention}!",
+          color=defaultColor
+        )
+  
+        sotwRole = get(ctx.guild.roles, id=sotwRoleID)
+        formerSotwRole = get(ctx.guild.roles, id=formerSotwRoleID)
+  
+        oldSotw = sotwRole.members[0]
+  
+        await newSotw.add_roles(sotwRole)
+        await oldSotw.add_roles(formerSotwRole)
+        await oldSotw.remove_roles(sotwRole)
+  
+        db["isVoting"] = False
+  
+        db["nominations"] = {}
+        db["votes"] = {}
 
-            Votes:
-            {votesList}
-            """,
+        await ctx.trigger_typing()
+        await ctx.send("<@&820074719419695154>")
+        await ctx.send(embed=finishEmbed)
+
+      else:
+        poll = "\n".join([f"{regionalIndicators[i]} {get(ctx.guild.members, id=int(userID)).mention}" for i, userID in enumerate(highestIDs)])
+
+        votePollEmbed = discord.Embed(
+          title="SOTW Tie",
+          description=poll,
           color=defaultColor
         )
 
-        finishEmbed.set_author(**embedAuthor)
-        finishEmbed.timestamp = datetime.datetime.utcnow()
+        db["isVoting"] = False
 
-        del db["nominations"]
-        del db["nominators"]
-        del db["votes"]
-        del db["voters"]
-        del db["nominationsPerUser"]
-        del db["votesPerUser"]
+        await lockChannel(ctx.guild, 771911980922961950)
 
-        sotwRole = ctx.guild.get_role(sotwRoleID)
-        formerSotwRole = ctx.guild.get_role(formerSotwRoleID)
-    
-        if sotwRole.members:
-          for member in sotwRole.members:
-            oldSOTW = member
-            break
-        
-        oldSOTW.remove_roles(sotwRole)
-        oldSOTW.add_roles(formerSotwRole)
-      
-        newSOTW = newSOTW[3:-1]
-        newSOTW = self.get_member(int(newSOTW))
-
-        newSOTW.add_roles(sotwRole)
-      
-        await ctx.trigger_typing()
-        await ctx.send(embed=finishEmbed)
         await ctx.trigger_typing()
         await ctx.send("<@&820074719419695154>")
+        pollMsg = await ctx.send(embed=votePollEmbed)
+
+        for i in range(0, len(highestIDs)):
+          await pollMsg.add_reaction(emojis[i])
 
     else:
       await ctx.trigger_typing()
-      await ctx.send("You can't finish voting if we aren't voting sussy baka!")
+      await ctx.send("Voting hasn't started yet")
 
   @commands.command()
   @has_permissions(manage_channels=True)
-  async def forcesotw(self, ctx, newSotw: discord.Member):
-    oldSotwList = [member for member in ctx.guild.members if self.bot.get_role(771887695654944799) in member.roles]
+  async def setSotw(self, ctx, newSotw: discord.Member):
+    newSotwRoleIDs = [role.id for role in newSotw.roles]
 
-    if len(oldSotwList) <= 1:
-      if len(oldSotwList) == 1:
-        oldSotw = oldSotwList[0]
+    if formerSotwRoleID not in newSotwRoleIDs:
+      sotwRole = get(ctx.guild.roles, id=sotwRoleID)
+      formerSotwRole = get(ctx.guild.roles, id=formerSotwRoleID)
 
-        newSotw.add_roles(self.bot.get_role(771887695654944799))
-        oldSotw.remove_roles(self.bot.get_role(771887695654944799))
-        oldSotw.add_roles(self.bot.get_role(772257145018122293))
+      oldSotw = sotwRole.members[0]
 
-      del db["nominations"]
-      del db["nominators"]
-      del db["votes"]
-      del db["voters"]
-      del db["nominationsPerUser"]
-      del db["votesPerUser"]
+      newSotw.add_roles(sotwRole)
+      oldSotw.add_roles(formerSotwRole)
+      oldSotw.remove_roles(sotwRole)
 
-      if len(oldSotwList) == 1:
-        await ctx.trigger_typing()
-        await ctx.send(f"**{newSotw}** SOTW")
+      await unlockChannel(ctx.guild, 771911980922961950)
+
+      await ctx.trigger_typing()
+      await ctx.send(f"Set **{newSotw.display_name}** as SOTW and reset the system")
 
     else:
       await ctx.trigger_typing()
-      await ctx.send("I found multiple people with SOTW. What the fuck")
+      await ctx.send("You can't give SOTW to a former SOTW")
+
+  @commands.command()
+  async def votes(self, ctx):
+    votes = Counter(db["votes"].values())
+
+    votes = sorted(votes.items(), key=lambda kv: kv[1])
+
+    voteList = "\n".join([f"**{i + 1}**. {get(ctx.guild.members, id=int(userID)).mention} => **{count}** votes" for i, (userID, count) in enumerate(reversed(votes))])
+
+    votesEmbed = discord.Embed(
+      title="Votes",
+      description=voteList,
+      color=defaultColor
+    )
+
+    votesEmbed.set_author(**embedAuthor)
+    votesEmbed.timestamp = datetime.datetime.utcnow()
+    votesEmbed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+
+    await ctx.trigger_typing()
+    await ctx.send(embed=votesEmbed)
+
+  @commands.command()
+  async def nominations(self, ctx):
+    nominations = []
+    for name in db["nominations"].values():
+      if name not in nominations:
+        nominations.append(name)
+
+    nominations.sort()
+
+    nominationsList = "\n".join([f"**{i + 1}**. {get(ctx.guild.members, id=int(userID)).mention}" for i, userID in enumerate(reversed(nominations))])
+
+    nominationsEmbed = discord.Embed(
+      title="Nominations",
+      description=nominationsList,
+      color=defaultColor
+    )
+
+    nominationsEmbed.set_author(**embedAuthor)
+    nominationsEmbed.timestamp = datetime.datetime.utcnow()
+    nominationsEmbed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+
+    await ctx.trigger_typing()
+    await ctx.send(embed=nominationsEmbed)
 
   @commands.command()
   @has_permissions(manage_channels=True)
   async def resetsotw(self, ctx):
     await ctx.trigger_typing()
-    await ctx.send("This will clear the SOTW database\nAre you sure? Send \"yes\" to continue")
+    await ctx.send("Resetting sotw...")
 
-    def check(author):
-      return author == ctx.author
+    db["isVoting"] = False
+  
+    db["nominations"] = {}
+    db["votes"] = {}
 
-    while True:
-      try:
-        message = self.bot.wait_for("message", check=check, timeout=5)
-
-        if message.content.lower() == "yes":
-          del db["nominations"]
-          del db["nominators"]
-          del db["votes"]
-          del db["voters"]
-          del db["nominationsPerUser"]
-          del db["votesPerUser"]
-
-          await ctx.trigger_typing()
-          await ctx.send("Cleared the SOTW database")
-
-      except:
-        await ctx.trigger_typing()
-        await ctx.send("You took too long to respond")
+    await ctx.trigger_typing()
+    await ctx.send("Reset the system")
 
 def setup(bot):
  bot.add_cog(sotw(bot))

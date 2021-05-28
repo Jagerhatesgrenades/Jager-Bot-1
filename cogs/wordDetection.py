@@ -3,17 +3,13 @@ from discord.ext import commands
 from discord.ext.commands import has_role
 from functions import defaultColor, embedAuthor, racistWords, staffID, dababyReactions
 import datetime
-from datetime import datetime as dt
 from replit import db
 import random
-
-now = dt.now()
-currentTime = now.strftime("%b %d %Y | %H:%M")
-
 
 class wordDetection(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
+    self.dmChannelID = 847408971967234058
 
   @commands.Cog.listener()
   async def on_message(self, msg):

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from functions import embedAuthor, defaultColor, staffRolesDict
+from functions import embedAuthor, defaultColor, staffRolesDict, staffID
 import datetime
 
 class info(commands.Cog):
@@ -111,29 +111,18 @@ class info(commands.Cog):
   @commands.command()
   async def serverinfo(self, ctx):
     server = ctx.guild
-    staffRoles = [
-      810585594638893096,
-      769577839313551360,
-      810586176515080223,
-      769579500752863243
-      ]
     
     coOwnerRoleID = 834184731193114714
 
-    serverAdmins = []
-    serverMods = []
+    serverStaff = []
 
     for member in server.members:
       for role in member.roles:
-        if role.id in staffRoles:
-          if staffRoles.index(role.id) in [0, 1]:
-            serverAdmins.append(member.mention)
+        if role.id == staffID:
+          serverStaff.append(member.mention)
 
-          elif staffRoles.index(role.id) in [2, 3]:
-            serverMods.append(member.mention)
 
-    serverAdmins = "\n".join(serverAdmins)
-    serverMods = "\n".join(serverMods)
+    serverStaff = "\n".join(serverStaff)
 
     i = 0
 
@@ -160,8 +149,7 @@ class info(commands.Cog):
       "Bots": f"`{i}`",
       "Owner": server.owner.mention,
       "Co-Owner": serverCoOwner,
-      "Admins": serverAdmins,
-      "Mods": serverMods,
+      "Staff": serverStaff,
       "Boosters": '\n'.join([user.mention for user in server.premium_subscribers])
     }
 
@@ -193,6 +181,20 @@ class info(commands.Cog):
     await ctx.trigger_typing()
     await ctx.send(embed=serverEmbed)
 
+  @commands.command(aliases=["av", "pfp"])
+  async def avatar(self, ctx, user: discord.Member=None):
+    if not user:
+      user = ctx.author
+
+    avEmbed = discord.Embed(color=defaultColor)
+    
+    avEmbed.set_author(name=user, icon_url=user.avatar_url)
+    avEmbed.set_image(url=user.avatar_url)
+    avEmbed.timestamp = datetime.datetime.utcnow()
+    avEmbed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+
+    await ctx.trigger_typing()
+    await ctx.send(embed=avEmbed)
 
 def setup(bot):
   bot.add_cog(info(bot))
